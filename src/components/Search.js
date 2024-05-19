@@ -16,7 +16,7 @@ function Search() {
     setError(null);
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/search`, { params: { q: query } });
-      console.log(response);
+      console.log(response.data);
       setSearchResults(response.data);
     } catch (error) {
       setError('Error fetching search results');

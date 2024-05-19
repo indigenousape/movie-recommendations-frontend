@@ -24,8 +24,8 @@ function MovieDetail() {
     fetchMovieDetails();
   }, [id]);
 
-  const filterProviders = (providers) => {
-    return providers.filter(provider => provider.type === 'subscription');
+  const filterStreamingProviders = (providers) => {
+    return providers.filter(provider => provider.type === 'subscription' || provider.type === 'free');
   };
 
   return (
@@ -46,11 +46,15 @@ function MovieDetail() {
             <div>
               {Object.entries(movie.streamingProviders).map(([country, providers]) => (
                 <div key={country}>
-                  {filterProviders(providers).length > 0 ? <h3>Available on:</h3> : null}
-                  {filterProviders(providers).map((provider, index) => (
+                  {filterStreamingProviders(providers).length > 0 && <h3>Available on:</h3>}
+                  {filterStreamingProviders(providers).map((provider, index) => (
                     <p key={index}>
                       <a href={provider.link} target="_blank" rel="noopener noreferrer">
-                        {provider.service.name}
+                        <img
+                          src={provider.service.imageSet.lightThemeImage}
+                          alt={provider.service.name}
+                          style={{ width: '100px', height: 'auto' }}
+                        />
                       </a>
                     </p>
                   ))}

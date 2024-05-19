@@ -1,25 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Search from './components/Search';
-import MovieDetail from './components/MovieDetail';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { RecommendationsProvider } from './contexts/RecommendationsContext';
-import { SearchProvider } from './contexts/SearchContext';
+import { SearchResultsProvider } from './contexts/SearchResultsContext';
+import MovieRecommendations from './components/MovieRecommendations';
+import MovieDetail from './components/MovieDetail';
 
 function App() {
   return (
-    <RecommendationsProvider>
-      <SearchProvider>
-        <Router>
-          <div>
-            <Routes>
-              <Route path="/" element={<Search />} />
-              <Route path="/movie/:id" element={<MovieDetail />} />
-              <Route path="/recommendations" element={<Search />} />
-            </Routes>
-          </div>
-        </Router>
-      </SearchProvider>
-    </RecommendationsProvider>
+    <Router>
+      <RecommendationsProvider>
+        <SearchResultsProvider>
+          <Routes>
+            <Route path="/" element={<MovieRecommendations />} />
+            <Route path="/movie/:id" element={<MovieDetail />} />
+          </Routes>
+        </SearchResultsProvider>
+      </RecommendationsProvider>
+    </Router>
   );
 }
 
