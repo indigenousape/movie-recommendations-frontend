@@ -168,29 +168,32 @@ function MovieRecommendations() {
         />
       )}
       <div className="suggestions-results relative">
-        <div className='flex-center'>
+        <div className='flex-between'>
           {showSearchResults ? (
             <>
-              <input
-                className='search-input'
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for a movie..."
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSearchMovies(e.target.value); }}
-              />
-              <button disabled={loading} className='main-btn' onClick={() => handleSearchMovies(searchQuery)}>Search{loading ? 'ing...' : ''}</button>
               <button className='secondary-btn' onClick={() => { setShowRecommendations(true); setShowSearchResults(false); setLastContext('recommendations'); }}>
                 Go to suggestions
               </button>
+              <div>
+                <input
+                  className='search-input'
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for a movie..."
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearchMovies(e.target.value); }}
+                />
+                <button disabled={loading} className='main-btn' onClick={() => handleSearchMovies(searchQuery)}>Search{loading ? 'ing...' : ''}</button>
+              </div>
+              <div></div>
             </>
           ) : (
             <>
-              <button disabled={loading} className='main-btn' onClick={handleFetchRecommendations}>{!loading ? 'What should we watch, ChatGPT?' : 'Thinking...'}</button>
               <button className='secondary-btn' onClick={() => { setShowSearchResults(true); setShowRecommendations(false); setLastContext('search');}}>
                 Go to search
               </button>
-              {recommendations.length > 0 && <button className='main-btn none-of-these-btn' onClick={markAllAsSeen}>None of these</button>}
+              <button disabled={loading} className='main-btn' onClick={handleFetchRecommendations}>{!loading ? 'What should we watch, MovieGuru?' : 'Thinking...'}</button>
+              {recommendations.length > 0 && <button className='main-btn' onClick={markAllAsSeen}>None of these</button>}
             </>
           )}
         </div>
@@ -217,7 +220,7 @@ function MovieRecommendations() {
         )}
         {showSearchResults && searchResults.length > 0 && (
           <div>
-            <h2 className='no-vert-m'>Search Results {searchQuery && `for "${searchQuery}"`}</h2>
+            <h2 className='text-center no-vert-m'>Search Results {searchQuery && `for "${searchQuery}"`}</h2>
             <SearchResults
               results={searchResults}
               likedMovies={likedMovies}
