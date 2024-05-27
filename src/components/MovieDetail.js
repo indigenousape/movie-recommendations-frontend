@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { delay, filterStreamingProviders } from '../utilities/utils';
 
 const cache = {};  // Define cache outside the component
 
@@ -12,15 +13,15 @@ function MovieDetail() {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get('q');
-
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const [lastView, setLastView] = useState('recommendations');
 
   useEffect(() => {
     const fetchMovieDetails = async (movieId) => {
       if (cache[movieId]) {
         setMovie(cache[movieId]);  // Set state from cache
-        await delay(50);
+        await delay(200);
         setLoaded(true);
+        console.log('Fetched movie details from cache:', movieId);
         return;
       }
 
@@ -33,16 +34,16 @@ function MovieDetail() {
       } catch (error) {
         console.error('Error fetching movie details:', error);
       } finally {
-        await delay(50);
+        await delay(200);
         setLoaded(true);
       }
     };
     fetchMovieDetails(id);  // Pass the movieId to the function
-  }, [id]);
 
-  const filterStreamingProviders = (providers) => {
-    return providers.filter(provider => (provider.type === 'subscription' || provider.type === 'free') && provider.service.id !== 'plutotv');
-  };
+    // Get last view from local storage or default to 'recommendations'
+    const savedLastView = localStorage.getItem('lastView') || 'recommendations';
+    setLastView(savedLastView);
+  }, [id]);
 
   const simpleNumberFormat = new Intl.NumberFormat('en-US', { notation: 'compact' });
   const pluralize = (count, noun) => count === 1 ? noun : noun + 's';
@@ -55,7 +56,6 @@ function MovieDetail() {
   };
 
   const getMPAARating = (movie) => {
-
     if (!movie.release_dates) {
       return 'Not Rated';
     }
@@ -65,6 +65,12 @@ function MovieDetail() {
     const rating = usRating ? usRating.release_dates.find(release => release.certification !== '') : null;
     return rating ? rating.certification : 'Not Rated';
   }
+
+  const handleBack = () => {
+    const lastContext = localStorage.getItem('lastContext');
+    const path = lastContext === 'search' ? `/?q=${query || ''}` : '/';
+    navigate(path);
+  };
 
   return (
     <div>
@@ -78,13 +84,13 @@ function MovieDetail() {
             />
           )}
           <div className="detail-container">
-            <button className="back-btn" onClick={() => navigate(`/?q=${query}`)}>Back</button>
+            <button className="back-btn" onClick={handleBack}>Back</button>
             <div className='flex flex-50 align-center movie-detail-columns'>
               <div>{movie.poster_path && (
                 <img
-                  className={`movie-detail-img ${loaded ? 'active' : ''}`}
                   src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
                   alt={movie.title}
+                  className={`movie-detail-img ${loaded ? 'active' : ''}`}
                 />
               )}
               </div>
@@ -135,11 +141,13 @@ function MovieDetail() {
                     </ul>
                   </div>}
                 </div>
-                <h3>Box Office:</h3>
+                {movie.revenue > 0 && movie.budget > 0 && <div><h3>Box Office:</h3>
                 <ul>
                   <li>Box office: ${simpleNumberFormat.format(movie.revenue)}</li>
                   <li>Budget: ${simpleNumberFormat.format(movie.budget)}</li>
                 </ul>
+                </div>
+                }
               </div>
             </div>
           </div>
